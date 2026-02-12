@@ -13,30 +13,33 @@
 # Необходимо для каждой книги выдавать количество оставшихся в библиотеке на текущий момент и количество книг несданных в библиотеку (будет выдаваться "Автор" "Название книги" "Сколько ениг не сдано")
 
 # Будет меню, описание класса, в классе будет инициализатор (конструктор), в классе будут методы по обработке записей. Всё остальное на свое усмотрение
-ListObjects = []
-
 class Library:
 
     def __init__(self):
         self.Book = None
-        self.Author = None
-        self.YearPublication = None
-        self.Reminder = None
-        self.ListObjects = ListObjects
+        self.Author = {}
+        self.BookAuthor = None
+        self.YearPublication = {}
+        self.BookYearPublication = None
+        self.Reminder = {}
+        self.BookReminder = None
 
     def AddBook(self): 
         self.Book = str(input("Введите название книги:"))
         print(f"Название {self.Book} успешно сохранено")
 
-        self.Author = str(input("Введите автора:"))
-        print(f"Автор {self.Author} книги {self.Book} успешно сохранён")
+        self.BookAuthor = str(input("Введите автора:"))
+        print(f"Автор {self.BookAuthor} книги {self.Book} успешно сохранён")
+        # Сохраним связку ключ - значение, название книги - автор, для будущей организации поиска
+        self.Author[self.BookAuthor] = self.Book
 
         while True:
             try:
                 AddYearPublication = int(input("Введите год издания книги:"))
                 if 1 <= AddYearPublication <= 2026:
-                    self.YearPublication = AddYearPublication
-                    print(f"Год издания {self.YearPublication} успешно сохранён")
+                    self.BookYearPublication = AddYearPublication
+                    print(f"Год издания {self.BookYearPublication} успешно сохранён")
+                    self.YearPublication[self.BookYearPublication] = self.Book
                     break
                 else:
                     print("Год должен быть от 1 до 2026!")
@@ -47,8 +50,9 @@ class Library:
             try:    
                 AddCountBook = int(input("Введите добавляемое кол-во книг:"))
                 if AddCountBook > 0:
-                    self.Reminder = AddCountBook
-                    print(f"Книга {self.Book} - в количесвте {self.Reminder} Год издания - {self.YearPublication} Автор - {self.Author} успешно сохранена")
+                    self.BookReminder = AddCountBook
+                    print(f"Книга {self.Book} - в количесвте {self.BookReminder} Год издания - {self.BookYearPublication} Автор - {self.BookAuthor} успешно сохранена")
+                    self.Reminder[self.BookReminder] = self.Book
                     break
                 else:
                     print("Число должно быть >0!!!")
@@ -56,17 +60,36 @@ class Library:
             except ValueError:
                 print("Вводите корректное кол-во книг, значение > 0")
 
-    def FindBookYearPublication(self):
-        FindedBookYearPublication = int(input("Введите искомый год публикации:"))
-        for obj in ListObjects:
-            print(obj)
+            #Добавляем наши данные в общий словарь, в котором key - название книги, а value - список, которых хранит в себе другие значения
 
+    def FindBookYearPublication(self):
+        InitYearPublication = int(input("Введите интересующий вас год издания книги:"))
+        for key in self.YearPublication.keys():
+            if key == InitYearPublication:
+                print(self.YearPublication[key])
+            else:
+                print("К сожалению книг данного года издания не найдено, если пожелаете другую, вновь воспользуйтесь навигацией через меню")
+
+    def FindBookByAuthor(self):
+        InitAuthorBook = str(input("Введите интересующего вас автора:"))
+        for key in self.Author.keys():
+            if key == InitAuthorBook:
+                print(self.Author[key])
+            else:
+                print("К сожалению книг данного автора не найдено, если пожелаете другую, вновь воспользуйтесь навигацией через меню")
+            
+    def FindBookByTitle(self):
+        InitTitleBook = str(input("Введите название интересующей вас книги:"))
+        for value in self.Author.values():
+            if value == InitTitleBook:
+                print(value)
+            else:
+                print("К сожалению книг по данному названию не найдено, если пожелаете найти другую, вновь воспользуйтесь навигацией через меню")
 def InitNewObject():
-        x = input("Введите имя нового объекта:")
+        x = input("Введите имя новой книги:")
         x = Library()
         x.AddBook()
-        ListObjects.append(x)
-        x.FindBookYearPublication()
+        x.FindBookByTitle()
 InitNewObject()
 
 
