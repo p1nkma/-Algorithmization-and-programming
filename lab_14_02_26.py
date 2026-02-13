@@ -3,9 +3,7 @@
 # - по автору
 # - по названию
 # - по количеству штук в библиотеке
-
 # - по автору и названию 
-
 # При заполнении БД контролировать ввод данных о годе выпуска книги и количестве книг билиотеки (имеется ввиду данной книги)
 
 # Необходимо для каждой книги вести учёт выдачи и сдачи в библиотеку (с помощью даты)
@@ -24,6 +22,9 @@ class Library:
         self.BookYearPublication = None
         self.Reminder = {}
         self.BookReminder = None
+        self.BookCount = {}
+        self.DateGiven = {}
+        self.DateTaken = {}
 
     def AddBook(self): 
         self.Book = str(input("Введите название книги:"))
@@ -33,7 +34,6 @@ class Library:
         # Cделаем так, чтобы если добавляли книгу того-же автора значения не перезаписывались, а сохранялись в список
         if self.BookAuthor in self.Author.keys():
             self.Author[self.BookAuthor].append(self.Book)
-            self.Author[self.BookAuthor] = self.Books
         else:
             # Сохраним связку ключ - значение, автор - название книги, для будущей организации поиска
             self.Books.append(self.Book)
@@ -45,8 +45,9 @@ class Library:
                 AddYearPublication = int(input("Введите год издания книги:"))
                 if 1 <= AddYearPublication <= 2026:
                     self.BookYearPublication = AddYearPublication
-                    print(f"Год издания {self.BookYearPublication} успешно сохранён")
-                    self.YearPublication[self.Book] = self.BookYearPublication
+                    if self.BookYearPublication not in self.YearPublication:
+                        self.YearPublication[self.BookYearPublication] = []
+                    self.YearPublication[self.BookYearPublication].append(self.Book) 
                     break
                 else:
                     print("Год должен быть от 1 до 2026!")
@@ -54,66 +55,85 @@ class Library:
                print("Введите корректное число")
 
         while True:
-            try:    
-                AddCountBook = int(input("Введите добавляемое кол-во книг:"))
+            try:
+                AddCountBook = int(input("Количество: "))
                 if AddCountBook > 0:
-                    self.BookReminder = AddCountBook
-                    print(f"Книга {self.Book} - в количесвте {self.BookReminder} Год издания - {self.BookYearPublication} Автор - {self.BookAuthor} успешно сохранена")
-                    self.Reminder[self.Book] = self.BookReminder
+                    self.BookReminder = AddCountBook  
+                    if self.Book in self.BookCount.keys():
+                        self.BookCount[self.Book] += self.BookReminder
+                    else:
+                        self.BookCount[self.Book] = self.BookReminder
+                    if self.BookReminder not in self.Reminder:  
+                        self.Reminder[self.BookReminder] = []
+                    self.Reminder[self.BookReminder].append(self.Book)
+            
+                    print(f" Книга {self.Book} (кол-во: {self.BookReminder})")
                     break
                 else:
-                    print("Число должно быть >0!!!")
-
+                    print("Количество > 0!")
             except ValueError:
-                print("Вводите корректное кол-во книг, значение > 0")
-
-            #Добавляем наши данные в общий словарь, в котором key - название книги, а value - список, которых хранит в себе другие значения
+                print("Число!")
 
     def FindBookByYearPublication(self):
-        InitYearPublication = int(input("Введите интересующий вас год издания книги:"))
-        for key in self.YearPublication.keys():
-            if key == InitYearPublication:
-                print(self.YearPublication[key])
-            else:
-                print("К сожалению книг данного года издания не найдено, если пожелаете другую, вновь воспользуйтесь навигацией через меню")
+        year = int(input("Год: "))
+        if year in self.YearPublication.keys():
+            print("Книги:", self.YearPublication[year])
+        else:
+            print("Книги не найдены")
 
     def FindBookByAuthor(self):
-        InitAuthorBook = str(input("Введите интересующего вас автора:"))
-        for key in self.Author.keys():
-            if key == InitAuthorBook:
-                print(self.Author[key])
-            else:
-                print("К сожалению книг данного автора не найдено, если пожелаете другую, вновь воспользуйтесь навигацией через меню")
-            
+        author = input("Автор: ")
+        if author in self.Author:
+            print("Книги:", self.Author[author])
+        else:
+            print("Автор не найден")
+
     def FindBookByTitle(self):
-        InitTitleBook = str(input("Введите название интересующей вас книги:"))
-        for value in self.Author.values():
-            if value == InitTitleBook:
-                print(value)
-            else:
-                print("К сожалению книг по данному названию не найдено, если пожелаете найти другую, вновь воспользуйтесь навигацией через меню")
+        title = input("Название: ")
+        for author_books in self.Author.values():  
+            if title in author_books:              
+                print(f"Найдена: {title}")
+                return
+        print("Книга не найдена")
 
     def FindBookByReminder(self):
-        InitReminderBook = int(input("Введите остаток интересующей вас книги:"))
-        for key in self.Reminder.keys():
-            if self.Reminder[key] == InitReminderBook:
-                print(key)
-            else:
-                print("К сожалению книг с данным остатком не найдено, если пожелаете другую, вновь воспользуйтесь навигацией через меню")
-
+        count = int(input("Количество: "))
+        if count in self.Reminder.keys():
+            print("Книги:", self.Reminder[count])
+        else:
+            print("Не найдено")
+    
+    def FindByAuthorTitle(self):
+        author,title = map(str,input("Введите автора книги и её название через пробел!").split())
+        if author not in self.Author:
+            print("Книга не найдена")
+        else:
+            for bookauthor, booktitle in self.Author.items():
+                if bookauthor == author:
+                    for name in booktitle:
+                        if name == title:
+                            print(f"Найдена книга: {name} автора {bookauthor}")
+                                   
     def GetAllBooks(self):
-        for key in self.Author.keys():
-            print(f"Книга: {self.Author[key]} автор книги: {key}")
+        print("\n Все книги:")
+        for author, books in self.Author.items():
+            for book in books:
+                print(f" {book} ({author})")
+    def GetBookRemind(self):
+        for book,count in self.BookCount.items():
+            print(f"Книга {book} в количестве {count} шт")
 
+    def GetBook(self):
+        book = str(input("Введите название желаемой книги:"))
+        if book in self.BookCount.keys():
+            pass
+            
 def InitNewObject():
-        x = input("Введите имя новой книги:")
         x = Library()
         x.AddBook()
         x.AddBook()
-        x.FindBookByAuthor()
+        x.GetBookRemind()
 InitNewObject()
-
-# Надо пересмотреть логику в остатке и сделать поиск по значениям, ведь мы выдаём книги, следовательно он изменяется, соответсвенно сохраняем изменения, при изменении ключа будет ряд ошибок
 
 
 
