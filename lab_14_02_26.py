@@ -17,6 +17,7 @@ class Library:
 
     def __init__(self):
         self.Book = None
+        self.Books = []
         self.Author = {}
         self.BookAuthor = None
         self.YearPublication = {}
@@ -29,9 +30,15 @@ class Library:
         print(f"Название {self.Book} успешно сохранено")
 
         self.BookAuthor = str(input("Введите автора:"))
+        # Cделаем так, чтобы если добавляли книгу того-же автора значения не перезаписывались, а сохранялись в список
+        if self.BookAuthor in self.Author.keys():
+            self.Author[self.BookAuthor].append(self.Book)
+            self.Author[self.BookAuthor] = self.Books
+        else:
+            # Сохраним связку ключ - значение, автор - название книги, для будущей организации поиска
+            self.Books.append(self.Book)
+            self.Author[self.BookAuthor] = self.Books
         print(f"Автор {self.BookAuthor} книги {self.Book} успешно сохранён")
-        # Сохраним связку ключ - значение, название книги - автор, для будущей организации поиска
-        self.Author[self.BookAuthor] = self.Book
 
         while True:
             try:
@@ -39,7 +46,7 @@ class Library:
                 if 1 <= AddYearPublication <= 2026:
                     self.BookYearPublication = AddYearPublication
                     print(f"Год издания {self.BookYearPublication} успешно сохранён")
-                    self.YearPublication[self.BookYearPublication] = self.Book
+                    self.YearPublication[self.Book] = self.BookYearPublication
                     break
                 else:
                     print("Год должен быть от 1 до 2026!")
@@ -52,7 +59,7 @@ class Library:
                 if AddCountBook > 0:
                     self.BookReminder = AddCountBook
                     print(f"Книга {self.Book} - в количесвте {self.BookReminder} Год издания - {self.BookYearPublication} Автор - {self.BookAuthor} успешно сохранена")
-                    self.Reminder[self.BookReminder] = self.Book
+                    self.Reminder[self.Book] = self.BookReminder
                     break
                 else:
                     print("Число должно быть >0!!!")
@@ -62,7 +69,7 @@ class Library:
 
             #Добавляем наши данные в общий словарь, в котором key - название книги, а value - список, которых хранит в себе другие значения
 
-    def FindBookYearPublication(self):
+    def FindBookByYearPublication(self):
         InitYearPublication = int(input("Введите интересующий вас год издания книги:"))
         for key in self.YearPublication.keys():
             if key == InitYearPublication:
@@ -85,13 +92,28 @@ class Library:
                 print(value)
             else:
                 print("К сожалению книг по данному названию не найдено, если пожелаете найти другую, вновь воспользуйтесь навигацией через меню")
+
+    def FindBookByReminder(self):
+        InitReminderBook = int(input("Введите остаток интересующей вас книги:"))
+        for key in self.Reminder.keys():
+            if self.Reminder[key] == InitReminderBook:
+                print(key)
+            else:
+                print("К сожалению книг с данным остатком не найдено, если пожелаете другую, вновь воспользуйтесь навигацией через меню")
+
+    def GetAllBooks(self):
+        for key in self.Author.keys():
+            print(f"Книга: {self.Author[key]} автор книги: {key}")
+
 def InitNewObject():
         x = input("Введите имя новой книги:")
         x = Library()
         x.AddBook()
-        x.FindBookByTitle()
+        x.AddBook()
+        x.FindBookByAuthor()
 InitNewObject()
 
+# Надо пересмотреть логику в остатке и сделать поиск по значениям, ведь мы выдаём книги, следовательно он изменяется, соответсвенно сохраняем изменения, при изменении ключа будет ряд ошибок
 
 
 
