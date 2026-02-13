@@ -32,13 +32,9 @@ class Library:
 
         self.BookAuthor = str(input("Введите автора:"))
         # Cделаем так, чтобы если добавляли книгу того-же автора значения не перезаписывались, а сохранялись в список
-        if self.BookAuthor in self.Author.keys():
-            self.Author[self.BookAuthor].append(self.Book)
-        else:
-            # Сохраним связку ключ - значение, автор - название книги, для будущей организации поиска
-            self.Books.append(self.Book)
-            self.Author[self.BookAuthor] = self.Books
-        print(f"Автор {self.BookAuthor} книги {self.Book} успешно сохранён")
+        if self.BookAuthor not in self.Author.keys():
+            self.Author[self.BookAuthor] = []
+        self.Author[self.BookAuthor].append(self.Book)
 
         while True:
             try:
@@ -168,24 +164,33 @@ class Library:
                     print(f"{author}: {book} ({on_hand} на руках)")
                     break
     def TakeInfoRemind(self):
-        a = 0
-        for key in self.Reminder.keys():
-            a += key
-        print(f"Всего книг в библиотеке: {a}")
+        total = sum(self.BookCount.values())
+        print(f"Всего книг в библиотеке: {total}")
            
-
+    def menu(self):
+        while True:
+            print("1. Добавить | 2. Выдать | 3. Вернуть")
+            print("4. Автор | 5. Год | 6. Остаток")
+            print("7. На руках | 8. Все | 9. Остатки | 10. Итого")
+            print("0. Выход")
         
+            choice = input(">> ")
+            if choice == "1": self.AddBook()
+            elif choice == "2": self.GivetBook()
+            elif choice == "3": self.TakeBook()
+            elif choice == "4": self.FindBookByAuthor()
+            elif choice == "5": self.FindBookByYearPublication()
+            elif choice == "6": self.FindBookByReminder()
+            elif choice == "7": self.RemindGivenBooks()
+            elif choice == "8": self.GetAllBooks()
+            elif choice == "9": self.GetBookRemind()
+            elif choice == "10": self.TakeInfoRemind()
+            elif choice == "0": break
 
+if __name__ == "__main__":
+    lib = Library()
+    lib.menu()
 
-def InitNewObject():
-        x = Library()
-
-        x.AddBook()
-        x.AddBook()
-        x.GivetBook()
-        x.RemindGivenBooks()
-
-InitNewObject()
 
 
 
