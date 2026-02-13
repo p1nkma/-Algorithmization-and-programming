@@ -5,7 +5,6 @@
 # - по количеству штук в библиотеке
 # - по автору и названию 
 # При заполнении БД контролировать ввод данных о годе выпуска книги и количестве книг билиотеки (имеется ввиду данной книги)
-
 # Необходимо для каждой книги вести учёт выдачи и сдачи в библиотеку (с помощью даты)
 
 # Необходимо для каждой книги выдавать количество оставшихся в библиотеке на текущий момент и количество книг несданных в библиотеку (будет выдаваться "Автор" "Название книги" "Сколько ениг не сдано")
@@ -25,6 +24,7 @@ class Library:
         self.BookCount = {}
         self.DateGiven = {}
         self.DateTaken = {}
+        self.GivenBook = {}
 
     def AddBook(self): 
         self.Book = str(input("Введите название книги:"))
@@ -119,20 +119,72 @@ class Library:
         for author, books in self.Author.items():
             for book in books:
                 print(f" {book} ({author})")
+
     def GetBookRemind(self):
         for book,count in self.BookCount.items():
             print(f"Книга {book} в количестве {count} шт")
 
-    def GetBook(self):
+    def GivetBook(self):
         book = str(input("Введите название желаемой книги:"))
-        if book in self.BookCount.keys():
-            pass
-            
+        if book in self.BookCount.keys() and self.BookCount[book] > 0:
+            for books in self.Reminder.values():
+                for bk in books:
+                    if bk == book:
+                        books.remove(bk)
+            self.BookCount[book] -= 1
+            if self.BookCount[book] not in self.Reminder.keys():
+                self.Reminder[self.BookCount[book]] = []
+            self.Reminder[self.BookCount[book]].append(book)
+            from datetime import date
+            if book not in self.DateGiven.keys():
+                self.DateGiven[book] = []
+            self.DateGiven[book].append(date.today())
+        else:
+            print("Книга не найдена или всё разобрали!")
+
+    def TakeBook(self):
+        book = str(input("Введите название книги, которую хотите сдать:"))
+        if book in self.DateGiven.keys():
+            self.BookCount[book] += 1
+            if self.BookCount[book] not in self.Reminder.keys():
+                self.Reminder[self.BookCount[book]] = []
+            self.Reminder[self.BookCount[book]].append(book)
+            from datetime import date
+            if book not in self.DateTaken.keys():
+                self.DateTaken[book] = []
+            self.DateTaken[book].append(date.today())
+        else:
+            print("Книга возвращена!")
+
+    def RemindGivenBooks(self):
+        for book in self.DateGiven.keys(): 
+            given_count = len(self.DateGiven[book])   
+            taken_count = len(self.DateTaken.get(book, [])) 
+            on_hand = given_count - taken_count        
+        
+        if on_hand > 0:
+            for author, books in self.Author.items():
+                if book in books:
+                    print(f"{author}: {book} ({on_hand} на руках)")
+                    break
+    def TakeInfoRemind(self):
+        a = 0
+        for key in self.Reminder.keys():
+            a += key
+        print(f"Всего книг в библиотеке: {a}")
+           
+
+        
+
+
 def InitNewObject():
         x = Library()
+
         x.AddBook()
         x.AddBook()
-        x.GetBookRemind()
+        x.GivetBook()
+        x.RemindGivenBooks()
+
 InitNewObject()
 
 
