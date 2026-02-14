@@ -1,3 +1,4 @@
+from datetime import datetime
 class Reader:
     def __init__(self, reader_id : int, Surname : str, First_name : str, Patronymic : str, YearBitth : int, Adress : str):
         self.reader_id = reader_id
@@ -6,7 +7,7 @@ class Reader:
         self.Patronymic = Patronymic
         self.YearBirth = YearBitth
         self.Adress = Adress
-        self.InfoById = {}
+        self.Info_userById = {}
 
     def add_NewReader(self):
         user_info = []
@@ -25,19 +26,19 @@ class Reader:
         while True:
             try:
                 birth_info = int(input("Введите год своего рождения:"))
-                if 1800 <= birth_info <= 2026:
+                if 1800 <= birth_info <= datetime.now().year:
                     self.YearBirth = birth_info
                     user_info.append(birth_info)
                     break
                 else:
-                    print("Введите дату рождения от 1800 до 2026")
+                    print(f"Введите дату рождения от 1800 до {datetime.now().year}")
             except ValueError:
                 print("Вводить надо число!")
                 
         self.Adress = str(input("Введите адресс читателя:"))
         user_info.append(self.Adress)
 
-        self.InfoById[self.reader_id] = user_info
+        self.Info_userById[self.reader_id] = user_info
 
 class Books(Reader):
     def __init__(self, book_id, book_title, book_author, book_yearpublic : int, book_page : int, book_movement : list, book_dateGiven, book_dateTaken):
@@ -50,6 +51,8 @@ class Books(Reader):
         self.book_movement = book_movement
         self.book_dateGiven = book_dateGiven
         self.book_dateTaken = book_dateTaken
+        self.Info_bookById = {}
+        self.GivenBook = {}
         
     def add_NewBook(self):
         book_info = []
@@ -84,7 +87,26 @@ class Books(Reader):
                     print("Введите дату издания > 0")
             except ValueError:
                 print("Вводить надо число!")
-    
+
+        self.Info_bookById[self.book_id] = book_info
+
+    def Get_Book(self):
+        for id, bookinf in self.Info_bookById.items():
+            print(f"{id} - {bookinf[0:2]}")
+        BookId = int(input("Введите id интересующей вас книги:"))
+        if BookId in self.Info_bookById.keys():
+            Date = input("Введите дату выдачи в формате ДД.ММ.ГГГГ:")
+            self.book_dateGiven = datetime.strptime(Date, "%d.%m.%Y").date()
+            if  self.GivenBook[self.Info_bookById[BookId][0:1]] not in self.GivenBook.keys():
+                self.GivenBook[self.Info_bookById[BookId][0:1]] = []
+            self.GivenBook[self.Info_bookById[BookId][0:1]].append(self.book_dateGiven)
+        else:
+            print("Вводите верное значение, существующие среди выданных вам ранее книг")
+                   
+lib = Books()
+lib.add_NewBook()
+lib.Get_Book()
+
         
     
 
