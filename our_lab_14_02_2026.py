@@ -17,11 +17,11 @@ def add_NewReader():
     first_name = str(input("Введите имя пользователя:"))
     patronymic = str(input("Введите отчество пользователя:"))
     yearbirth = 0
-    valid = False
-    while not valid:
+    isValid_yearbirth = False
+    while not isValid_yearbirth:
         try:
             yearbirth = int(input("Введите год рождения:"))
-            valid = True
+            isValid_yearbirth = True
         except ValueError:
             print("Вводите число!")
     adress = str(input("Введите адресс читателя:"))
@@ -31,24 +31,23 @@ def add_NewBook():
         book_id = int(input("Введите id книги:"))
         book_title = str(input("Введите название книги:"))
         book_author = str(input("Введите автора книги:"))
-        valid_yearpublic = False
+        isValid_yearpublic = False
         book_yearpublic = 0
-        while not valid_yearpublic:
+        while not isValid_yearpublic:
             try:
                 book_yearpublic = int(input("Введите год издания:"))
-                valid_yearpublic = True
+                isValid_yearpublic = True
             except ValueError:
                 print("Вводите число")
-        valid_page = False
+        isValid_page = False
         book_page = 0
-        while not valid_page:
+        while not isValid_page:
             try:
                 book_page = int(input("Введите кол-во страниц:"))
-                valid_page = True
+                isValid_page = True
             except ValueError:
                 print("Вводите число")
         book_movement = []
-
         return(book_id,book_title,book_author,book_yearpublic,book_page,book_movement)
 
 
@@ -96,6 +95,10 @@ class Book:
                         dateTaken = datetime.strptime(date, "%d.%m.%Y").date()
                         if dateTaken >= book.book_movement[-1][1]:
                             book.book_movement[-1].append(dateTaken)
+                            return
+                        else:
+                            print("Дата сдачи раньше выдачи!")
+                            return
 
     def getUnissuedBooks(self):
         print("Книги, которые еще ни разу никто не брал:")
@@ -106,7 +109,7 @@ class Book:
     def getUnreturnedBooks(self):
         for book in books.values():
             if book.book_movement != []:
-                if len(book.book_movement[-1]) == 2: #проверяем что в списке который мы передавали book_movement всего 2 записи
+                if len(book.book_movement[-1]) == 2: #проверяем что в списке который мы передавали book_movement всего 2 записи => есть id читателя и дата выдачи
                     for reader in readers.values():
                         if reader.reader_id == book.book_movement[-1][0]:
                             print(f"Книга: {book.book_title} у {reader.surname}  {reader.first_name} {reader.patronymic}")
@@ -120,7 +123,7 @@ class Book:
                             print(*id[1:3],book.book_title,f"{reader.surname} {reader.first_name} {reader.patronymic}")
             else:
                 print(f"{book.book_title} не была выдана ни разу!")
-                
+
 def show_menu():
     print("\n" + "="*30)
     print("БИБЛИОТЕКА")
