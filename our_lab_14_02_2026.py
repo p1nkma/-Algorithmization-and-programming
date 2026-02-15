@@ -117,9 +117,10 @@ class Book:
                 for reader in readers.values():
                     for id in book.book_movement:
                         if id[0] == reader.reader_id:
-                            print(*id[1:3],book.book_title,f"{reader.surname}  {reader.first_name} {reader.patronymic}")
+                            print(*id[1:3],book.book_title,f"{reader.surname} {reader.first_name} {reader.patronymic}")
             else:
                 print(f"{book.book_title} не была выдана ни разу!")
+                
 def show_menu():
     print("\n" + "="*30)
     print("БИБЛИОТЕКА")
@@ -179,8 +180,6 @@ b = Book(9, "451 градус по Фаренгейту", "Рэй Брэдбер
 books[9] = b
 b = Book(10, "Дюна", "Фрэнк Герберт", 1965, 412, [])
 books[10] = b
-
-
 
 a = Reader(1, "Иванов", "Иван", "Иванович", 1990, "Москва, ул. Ленина 10")
 readers[1] = a
